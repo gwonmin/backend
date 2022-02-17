@@ -3,9 +3,40 @@ const path = require('path');
 
 const app = express();
 
-
-
 const indexRoute = require('./routes/index.js');
+
+const mongoose = require('mongoose');
+
+mongoose.connect("mongodb://127.0.0.1:27017/nodejs", {
+    useNewUrlParser: true
+}).then(()=> {
+    console.log("Connected to MongoDB...");
+}).catch((err)=> {
+    console.log(err.message);
+});
+
+const UserSchema = new mongoose.Schema({
+    name: String,
+    age: Number,
+    saveData: {
+        type: Date,
+        default: Date.now,
+    },
+});
+
+const User = mongoose.model("User", UserSchema)
+
+const me = new User({
+    name: "gwon min yang",
+    age: 27
+})
+
+me.save()
+.then(()=> {
+    console.log(me);
+}).catch((err)=> {
+    console.log("Error, ", err);
+})
 
 const pickRandom = (arr) => {
     let idx = Math.floor(Math.random() * arr.length);
