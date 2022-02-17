@@ -3,6 +3,8 @@ const path = require('path');
 
 const app = express();
 
+
+
 const indexRoute = require('./routes/index.js');
 
 const pickRandom = (arr) => {
@@ -27,8 +29,12 @@ const mbti = ["INTJ - 용의주도한 전략가 (Architect)",
     "ESTP - ​모험을 즐기는 사업가 (Entrepreneur)",
     "ESFP - 자유로운 영혼의 연예인 (Entertainer)"];
 
-direction = ['동', '서', '남', '북'];
+const direction = ['동', '서', '남', '북'];
 const reward = ['우정', '행운', '재물', '지혜', '즐거움', '놀라움'];
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
 
 app.use('/', indexRoute)
 // req: resquest(요청), 사용자의 브라우저 정보, 질문(주소창), 로그인 정보
