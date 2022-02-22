@@ -1,6 +1,4 @@
-— 오늘 오후 6:00
-직접 해봐야할거같아요
-﻿
+
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
