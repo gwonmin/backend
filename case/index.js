@@ -1,3 +1,6 @@
+— 오늘 오후 6:00
+직접 해봐야할거같아요
+﻿
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -10,7 +13,7 @@ const Strategy = require("passport-local");
 // admin:1234
 
 mongoose
-  .connect("mongodb+srv://gwonmin:1234@simple-board-cluster.onxkl.mongodb.net/elice")
+  .connect("mongodb+srv://admin:1234@cluster0.yfbio.mongodb.net/elice")
   .then(async () => {
     try {
       const user = new User({
@@ -75,6 +78,11 @@ passport.deserializeUser((user, done) => {
   done(null, user); // req.user 갱신
 });
 
+app.use((req, res, next) => {
+  console.log("세션", req.session);
+  next();
+});
+
 app.post(
   "/login",
   passport.authenticate("local", {
@@ -93,12 +101,58 @@ app.get("/login", (req, res) => {
     `);
 });
 
+app.get("/logout", (req, res) => {
+  req.logout(); // 클라이언트가 서버와 연결된 상태라면 세션 지움
+  res.redirect("/");
+});
+
+const post = [];
+
+app.post("/post", (req, res) => {
+  if (req.user === undefined) {
+    res.send({
+      status: "로그인 하고 다시 오삼 ㅡㅡ",
+    });
+    return;
+  }
+  const { body, title } = req.body;
+  const { username } = req.user;
+  post.push({
+    body: body,
+    title: title,
+    author: username,
+  });
+  res.redirect("/");
+});
+
 app.get("/", (req, res) => {
   console.log(req.user);
   if (req.user === undefined) {
-    res.send("로그인이 필요합니다");
+    res.redirect("/login");
   } else {
-    res.send(`${req.user.username}님 환영합니다.`);
+    res.send(`
+        <h1>${req.user.username}님 환영합니다.</h1>
+        <a href="/logout">로그아웃</a>
+
+        <form action="/post" method="POST">
+            <input type="text" name="title" placeholder="title.."/>
+            <textarea name="body" placeholder="body.."></textarea>
+            <input type="submit" />
+        </form>
+
+        ${post
+          .map(
+            (p) => `
+            <div>
+                <p>제목: ${p.title}</p>
+                <p>작성자: ${p.author}</p>
+                <p>${p.body}</p>
+            </div>
+            <hr />
+        `
+          )
+          .join("")}
+        `);
   }
 });
 
